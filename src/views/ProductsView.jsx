@@ -1,64 +1,39 @@
-import { useState } from 'react'
-import { Alert, Col, Row } from 'react-bootstrap'
-import ProductCard from '../components/ProductCard'
+import React, { useState } from "react";
+import {ProductCard} from 'proyecto-react-vite-6-clases-vitest/src/components/ProductCard';
 
-const productos = [
-  {
-    id: 1,
-    nombre: 'Teclado mecánico',
-    descripcion: 'Ejemplo de producto reutilizando el mismo componente.',
-    precio: 39990,
-  },
-  {
-    id: 2,
-    nombre: 'Mouse inalámbrico',
-    descripcion: 'Los datos llegan a ProductCard mediante props.',
-    precio: 24990,
-  },
-  {
-    id: 3,
-    nombre: 'Audífonos',
-    descripcion: 'La vista decide qué datos entregar al componente.',
-    precio: 29990,
-  },
-]
+function ProductsView({ products, onAddToCart}) {
+  const [searchTerm, setSearchTerm] = useState('');
 
-function ProductsView() {
-  const [seleccionado, setSeleccionado] = useState(null)
-
-  function seleccionarProducto(producto) {
-    setSeleccionado(producto)
-    sessionStorage.setItem('productoSeleccionado', JSON.stringify(producto))
-  }
+  const filteredProducts= products ? products.filter((p) =>
+    p.name.toLowercase().includes(searchTerm.toLocaleLowerCase())
+  ) : [];
 
   return (
-    <section className="view-box view-blue">
-      <div className="area-label">Vista: ProductsView.jsx</div>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold">Catalogo Completo</h2>
+        <input
+          type="text"
+          className="form-control w-25"
+          placeholder="Buscar producto..."
+          value={searchTerm}
+          onChange={(e) =>setSearchTerm(e.target.value)}
+        />
+      </div>
 
-      <h1>Productos</h1>
-      <p>
-        Esta vista tiene los datos y se los pasa al componente ProductCard usando props.
-      </p>
-
-      {seleccionado && (
-        <Alert variant="info">
-          Seleccionaste: <strong>{seleccionado.nombre}</strong>.
-          También quedó guardado en sessionStorage.
-        </Alert>
-      )}
-
-      <Row className="g-3">
-        {productos.map((producto) => (
-          <Col md={4} key={producto.id}>
-            <ProductCard
-              producto={producto}
-              onSeleccionar={seleccionarProducto}
-            />
-          </Col>
-        ))}
-      </Row>
-    </section>
+      <div className="row">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+          ))
+        ) : (
+          <div className="col-12 alert alert-warning">
+            No se encontraron productos que coincidan con la busqueda
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
-export default ProductsView
+export default ProductsView;
