@@ -1,35 +1,36 @@
 import React, { useState } from "react";
 import ProductCard from '../components/ProductCard';
 
-function ProductsView({ products, onAddToCart}) {
-  const [searchTerm, setSearchTerm] = useState('');
+function ProductsView({ products = [], onAddToCart}) {
+  const [search, setSearch] = useState('');
 
-  const filteredProducts= products ? products.filter((p) =>
-    p.name.toLowercase().includes(searchTerm.toLocaleLowerCase())
-  ) : [];
+  const filteredProducts = products.filter((p) => {
+    const productName = p?.name || p?.nombre || '';
+    return productName.toLowerCase().includes(search.toLocaleLowerCase());
+  });
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">Catalogo Completo</h2>
+    <div className="container">
+      <h2 className="mb-4 fw-bold">Catalogo de Productos</h2>
+
+
+      <div className="mb-4">
         <input
           type="text"
-          className="form-control w-25"
+          className="form-control form-control-lg"
           placeholder="Buscar producto..."
-          value={searchTerm}
-          onChange={(e) =>setSearchTerm(e.target.value)}
+          value={search}
+          onChange={(e) =>setSearch(e.target.value)}
         />
       </div>
 
       <div className="row">
         {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+          filteredProducts.map((p) => (
+            <ProductCard key={p.id} product={p} onAddToCart={onAddToCart} />
           ))
         ) : (
-          <div className="col-12 alert alert-warning">
-            No se encontraron productos que coincidan con la busqueda
-          </div>
+          <p className="text-muted">No se encontraron productos</p>
         )}
       </div>
     </div>
