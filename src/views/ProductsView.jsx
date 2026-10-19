@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {ProductCard} from 'proyecto-react-vite-6-clases-vitest/src/components/ProductCard';
+import ProductCard from '../components/ProductCard';
 
 function ProductsView({ products, onAddToCart}) {
   const [searchTerm, setSearchTerm] = useState('');

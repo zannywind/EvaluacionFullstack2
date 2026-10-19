@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductCard } from 'proyecto-react-vite-6-clases-vitest/src/components/ProductCard';
+import ProductCard from '../components/ProductCard';
 
 function CategoriesView({ products, onAddToCart }) {
   const categories = ["Categoría 1", "Categoría 2", "Categoría 3"];

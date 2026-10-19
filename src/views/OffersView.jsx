@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductCard } from 'proyecto-react-vite-6-clases-vitest/src/components/ProductCard';
+import ProductCard from '../components/ProductCard';
 
 function OffersView({ products, onAddToCart }) {
     const offers = products ? products.filter((p) => p.offer) : [];
