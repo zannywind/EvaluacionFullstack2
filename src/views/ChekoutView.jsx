@@ -1,61 +1,112 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function ChekoutView({ total, onProcessPayment }) {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    apellidos: '',
-    correo: '',
-    calle: '',
-    comuna: 'Cerrillos',
-    region: 'Región Metropolitana de Santiago'
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+function ChekoutView({
+  cart,
+  setCart,
+  onNavigate,
+  setLastOrder,
+  checkoutData,
+  setCheckoutData,
+  hasError,
+  setHasError
+}) {
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.nombre && formData.correo && formData.calle) {
-      onProcessPayment(true, formData);
+
+    const direccionLimpia = checkoutData.direccion.trim().toLowerCase();
+
+    if (direccionLimpia === 'plaza de maipu') {
+      setHasError(false);
+      if (setLastOrder) {
+        setLastOrder({
+          cliente: checkoutData.nombre,
+          direccion: checkoutData.direccion,
+          total: total
+        });
+      }
+      setCart([]);
+      onNavigate('success');
     } else {
-      onProcessPayment(false, formData);
+      // Si la dirección no es "plaza de maipu", vaciamos ÚNICAMENTE la casilla de dirección y mostramos error
+      setHasError(true);
+      setCheckoutData((prev) => ({ ...prev, direccion: '' }));
+      onNavigate('error');
     }
   };
 
   return (
     <div className="container my-4">
-      <div className="card p-4 shadow-sm mx-auto" style={{ maxWidth: '600px' }}>
-        <h3 className="mb-3 fw-bold">Información de Pago</h3>
-        <p className="fw-bold text-primary">Total a Pagar: ${total}</p>
+      <h2 className="fw-bold mb-4">Finalizar Compra</h2>
+      <div className="row">
+        <div className="col-md-8">
+          <form onSubmit={handleSubmit} className="card p-4 shadow-sm mb-4">
+            <h4 className="fw-bold mb-3">Datos de Envío</h4>
 
-        <form onSubmit={handleSubmit}>
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <label className="form-label">Nombre *</label>
-              <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange} required />
+            <div className="mb-3">
+              <label className="form-label">Nombre Completo</label>
+              <input
+                type="text"
+                className="form-control"
+                required
+                value={checkoutData.nombre}
+                onChange={(e) =>
+                  setCheckoutData({ ...checkoutData, nombre: e.target.value })
+                }
+              />
             </div>
-            <div className="col-md-6">
-              <label className="form-label">Apellidos</label>
-              <input type="text" className="form-control" name="apellidos" value={formData.apellidos} onChange={handleChange} />
+
+            <div className="mb-3">
+              <label className="form-label">Correo Electrónico</label>
+              <input
+                type="email"
+                className="form-control"
+                required
+                value={checkoutData.email}
+                onChange={(e) =>
+                  setCheckoutData({ ...checkoutData, email: e.target.value })
+                }
+              />
             </div>
-          </div>
 
-          <div className="mb-3">
-            <label className="form-label">Correo Electrónico *</label>
-            <input type="email" className="form-control" name="correo" value={formData.correo} onChange={handleChange} required />
-          </div>
+            <div className="mb-3">
+              <label className="form-label">Dirección de Envío</label>
+              <input
+                type="text"
+                className={`form-control ${hasError ? 'is-invalid' : ''}`}
+                placeholder="Ej: Plaza de Maipu"
+                required
+                value={checkoutData.direccion}
+                onChange={(e) => {
+                  setHasError(false);
+                  setCheckoutData({ ...checkoutData, direccion: e.target.value });
+                }}
+              />
+              {hasError ? (
+                <div className="text-danger fw-bold mt-1">
+                  este dato esta mal ingresado
+                </div>
+              ) : (
+                <div className="form-text text-muted">
+                  * Zona de cobertura activa: <strong>Plaza de Maipu</strong>
+                </div>
+              )}
+            </div>
 
-          <h5 className="mt-4">Dirección de Entrega</h5>
-          <div className="mb-3">
-            <label className="form-label">Calle y Número *</label>
-            <input type="text" className="form-control" name="calle" value={formData.calle} onChange={handleChange} required />
-          </div>
+            <button type="submit" className="btn btn-success btn-lg fw-bold w-100">
+              Pagar ${total.toLocaleString()}
+            </button>
+          </form>
+        </div>
 
-          <button type="submit" className="btn btn-success btn-lg w-100 mt-3">
-            Pagar Ahora ${total}
-          </button>
-        </form>
+        <div className="col-md-4">
+          <div className="card p-3 shadow-sm">
+            <h5 className="fw-bold">Resumen de Compra</h5>
+            <p className="text-muted mb-2">Total ítems: {cart.length}</p>
+            <h4 className="fw-bold text-success">${total.toLocaleString()}</h4>
+          </div>
+        </div>
       </div>
     </div>
   );

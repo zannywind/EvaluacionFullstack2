@@ -1,13 +1,30 @@
 import React from 'react';
 
-function ErrorView({ setCurrentView }) {
+function ErrorView({ onNavigate }) {
   return (
     <div className="container my-5 text-center">
-      <div className="alert alert-danger p-4 shadow-sm">
-        <h2 className="fw-bold"> No se pudo realizar el pago</h2>
-        <p>Ocurrio un problema al procesar los datos de tu tarjeta o formulario.</p>
-        <button className="btn btn-warning mt-3 me-2" onClick={() => setCurrentView("checkout")}>Volver a Intentar el Pago</button>
-        <button className="btn btn-secondary mt-3" onClick={() => setCurrentView("home")}>Ir al Inicio</button>
+      <div className="card p-5 shadow-sm bg-light border-danger">
+        <h1 className="text-danger fw-bold mb-3">No se pudo realizar el pago</h1>
+        <p className="fs-5 text-muted">
+          Ocurrió un problema al procesar los datos de tu tarjeta o formulario.
+        </p>
+
+        <hr className="my-4" />
+
+        <div className="d-flex justify-content-center gap-3">
+          <button
+            className="btn btn-warning btn-lg fw-bold px-4"
+            onClick={() => onNavigate && onNavigate('checkout')}
+          >
+            Volver a Intentar el Pago
+          </button>
+          <button
+            className="btn btn-secondary btn-lg fw-bold px-4"
+            onClick={() => onNavigate && onNavigate('home')}
+          >
+            Ir al Inicio
+          </button>
+        </div>
       </div>
     </div>
   );

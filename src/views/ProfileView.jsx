@@ -1,38 +1,197 @@
 import React, { useState } from 'react';
 
-function ProfileView() {
-  const [isLogin, setIsLogin] = useState(true);
+function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
+  const [isRegistering, setIsRegistering] = useState(false);
 
-  return (
-    <div className="row justify-content-center my-4">
-      <div className="col-md-6">
-        <div className="card shadow-sm p-4">
-          <h3 className="text-center mb-4 fw-bold">{isLogin ? "Iniciar Sesión" : "Crear Cuenta"}</h3>
-          <form onSubmit={(e) => e.preventDefault()}>
-            {!isLogin && (
-              <div className="mb-3">
-                <label className="form-label">Nombre Completo</label>
-                <input type="text" className="form-control" placeholder="Pedro Hácquer" />
-              </div>
-            )}
-            <div className="mb-3">
-              <label className="form-label">Correo Electrónico</label>
-              <input type="email" className="form-control" placeholder="ejemplo@correo.com" />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Contraseña</label>
-              <input type="password" className="form-control" placeholder="••••••••" />
-            </div>
-            <button type="submit" className="btn btn-primary w-100 mb-3">
-              {isLogin ? "Ingresar" : "Registrarse"}
+  // Formulario Login
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Formulario Registro
+  const [regNombre, setRegNombre] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    if (email.trim() === 'da@gmail.com' && password === 'aaa') {
+      const adminUser = { email, nombre: 'admin', isAdmin: true };
+      setUser(adminUser);
+      onNavigate('home');
+    } else {
+      const primerNombre = email.split('@')[0];
+      const normalUser = { email, nombre: primerNombre, isAdmin: false };
+      setUser(normalUser);
+
+      if (setCheckoutData) {
+        setCheckoutData((prev) => ({ ...prev, email: email }));
+      }
+      onNavigate('home');
+    }
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    const primerNombre = regNombre.trim().split(' ')[0];
+    const newUser = {
+      email: regEmail,
+      nombre: primerNombre,
+      isAdmin: false
+    };
+
+    setUser(newUser);
+
+    if (setCheckoutData) {
+      setCheckoutData((prev) => ({
+        ...prev,
+        nombre: regNombre,
+        email: regEmail
+      }));
+    }
+
+    onNavigate('home');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    onNavigate('home');
+  };
+
+  // Si hay usuario logueado, muestra la ficha del perfil con el botón de Salir
+  if (user) {
+    return (
+      <div className="container my-5">
+        <div className="card p-5 shadow-sm mx-auto text-center" style={{ maxWidth: '480px' }}>
+          <div className="display-4 mb-3">👤</div>
+          <h2 className="fw-bold mb-1">
+            {user.isAdmin ? 'Administrador' : user.nombre}
+          </h2>
+          <p className="text-muted fs-5 mb-3">{user.email}</p>
+
+          <div className="mb-4">
+            <span className={`badge ${user.isAdmin ? 'bg-danger' : 'bg-primary'} fs-6 px-3 py-2`}>
+              {user.isAdmin ? 'Rol: Admin' : 'Rol: Cliente'}
+            </span>
+          </div>
+
+          <hr />
+
+          <div className="d-flex justify-content-center gap-2 mt-3">
+            <button
+              className="btn btn-outline-secondary fw-bold"
+              onClick={() => onNavigate('home')}
+            >
+              Ir a la Tienda
             </button>
-          </form>
-          <div className="text-center">
-            <button className="btn btn-link text-decoration-none" onClick={() => setIsLogin(!isLogin)}>
-              {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
+            <button
+              className="btn btn-danger fw-bold"
+              onClick={handleLogout}
+            >
+              Cerrar Sesión
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container my-5">
+      <div className="card p-4 shadow-sm mx-auto" style={{ maxWidth: '450px' }}>
+        {!isRegistering ? (
+          <>
+            <h3 className="text-center fw-bold mb-4">Iniciar Sesión</h3>
+            <form onSubmit={handleLogin}>
+              <div className="mb-3">
+                <label className="form-label">Correo Electrónico</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" className="btn btn-primary w-100 fw-bold mb-3">
+                Ingresar
+              </button>
+            </form>
+
+            <div className="text-center">
+              <button
+                className="btn btn-link text-decoration-none"
+                onClick={() => setIsRegistering(true)}
+              >
+                ¿No tienes cuenta? Regístrate
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h3 className="text-center fw-bold mb-4">Crear Cuenta</h3>
+            <form onSubmit={handleRegister}>
+              <div className="mb-3">
+                <label className="form-label">Nombre Completo</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  required
+                  value={regNombre}
+                  onChange={(e) => setRegNombre(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Correo Electrónico</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  required
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  required
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" className="btn btn-success w-100 fw-bold mb-3">
+                Registrarse
+              </button>
+            </form>
+
+            <div className="text-center">
+              <button
+                className="btn btn-link text-decoration-none"
+                onClick={() => setIsRegistering(false)}
+              >
+                ¿Ya tienes cuenta? Inicia sesión
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,84 +1,81 @@
-import React from "react";
+import React from 'react';
 
-function AppNavbar({ currentView, setCurrentView, cartCount}) {
+function AppNavbar({ currentView, setCurrentView, cartCount = 0, user }) {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 px-3">
-      <div className="container-fluid">
-        <button
-        className="navbar-brand btn btn-link text-white text-decoration-none fw-bold"
-        onClick={() => setCurrentView('home')}
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+      <a
+        className="navbar-brand fw-bold"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          setCurrentView('home');
+        }}
       >
         Mai estor
-      </button>
+      </a>
 
-      <button
-        className="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
+      {/* Links de navegación principales (SIN Perfil/Registro ni Admin por defecto) */}
+      <div className="navbar-nav me-auto">
+        <button
+          className={`nav-link btn btn-link ${currentView === 'home' ? 'active' : ''}`}
+          onClick={() => setCurrentView('home')}
         >
-          <span className="navbar-toggler-icon"></span>
+          Home
+        </button>
+        <button
+          className={`nav-link btn btn-link ${currentView === 'products' ? 'active' : ''}`}
+          onClick={() => setCurrentView('products')}
+        >
+          Productos
+        </button>
+        <button
+          className={`nav-link btn btn-link ${currentView === 'categories' ? 'active' : ''}`}
+          onClick={() => setCurrentView('categories')}
+        >
+          Categorías
+        </button>
+        <button
+          className={`nav-link btn btn-link ${currentView === 'offers' ? 'active' : ''}`}
+          onClick={() => setCurrentView('offers')}
+        >
+          Ofertas
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <button
-              className={`nav-link btn ${currentView === 'home' ? 'active fw-bold' : ''}`}
-              onClick={() => setCurrentView('home')}
-            >
-              Home
-            </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link btn ${currentView === 'products' ? 'active fw-bold' : ''}`}
-                onClick={() => setCurrentView('products')}
-              >
-                Productos
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link btn ${currentView === 'categories' ? 'active fw-bold' : ''}`}
-                onClick={() => setCurrentView('categories')}
-              >
-                Categorias
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link btn ${currentView === 'offers' ? 'active fw-bold' : ''}`}
-                onClick={() => setCurrentView('offers')}
-              >
-                Ofertas
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link btn ${currentView === 'profile' ? 'active fw-bold' : ''}`}
-                onClick={() => setCurrentView('profile')}
-              >
-                Perfil / Registro
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link btn ${currentView === 'admin' ? 'active fw-bold' : ''}`}
-                onClick={() => setCurrentView('admin')}
-              >
-                Panel Admin
-              </button>
-            </li> 
-          </ul>
-
-          <button className="btn btn-success" onClick={() => setCurrentView('cart')}>
-            Carrito <span className="badge bd-light text-dark ms-1">{cartCount}</span>
+        {/* Panel Admin SOLO si está logueado como Admin */}
+        {user && user.isAdmin && (
+          <button
+            className={`nav-link btn btn-link ${currentView === 'admin' ? 'active' : ''}`}
+            onClick={() => setCurrentView('admin')}
+          >
+            Panel Admin
           </button>
-        </div>
+        )}
+      </div>
+
+      {/* Zona Derecha: Perfil / Registro + Carrito */}
+      <div className="d-flex align-items-center gap-2">
+        {user ? (
+          <button
+            className="btn btn-outline-light fw-bold"
+            onClick={() => setCurrentView('profile')}
+          >
+            👤 {user.isAdmin ? 'admin' : user.nombre}
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary fw-bold"
+            onClick={() => setCurrentView('profile')}
+          >
+            Iniciar Sesión / Registro
+          </button>
+        )}
+
+        <button className="btn btn-success" onClick={() => setCurrentView('cart')}>
+          Carrito <span className="badge bg-light text-dark ms-1">{cartCount}</span>
+        </button>
       </div>
     </nav>
-  )
+  );
 }
 
-export default AppNavbar
+export default AppNavbar;
