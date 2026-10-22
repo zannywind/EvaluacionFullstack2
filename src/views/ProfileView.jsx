@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getProfile, saveProfile } from '../data/userProfiles';
 
 function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -11,21 +12,25 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
   const [regNombre, setRegNombre] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regDireccion, setRegDireccion] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (email.trim() === 'da@gmail.com' && password === 'aaa') {
-      const adminUser = { email, nombre: 'admin', isAdmin: true };
+    setError('');
+    if (email.trim().toLowerCase() === 'da@gmail.com' && password !== 'aaa') { setError('Credenciales de administrador incorrectas.'); return; }
+    if (email.trim().toLowerCase() === 'da@gmail.com' && password === 'aaa') {
+      const adminUser = { email: 'da@gmail.com', nombre: 'admin', ...getProfile('da@gmail.com'), isAdmin: true };
       setUser(adminUser);
       onNavigate('home');
     } else {
       const primerNombre = email.split('@')[0];
-      const normalUser = { email, nombre: primerNombre, isAdmin: false };
+      const normalUser = { email: email.trim().toLowerCase(), nombre: primerNombre, ...getProfile(email), isAdmin: false };
       setUser(normalUser);
 
       if (setCheckoutData) {
-        setCheckoutData((prev) => ({ ...prev, email: email }));
+        setCheckoutData((prev) => ({ ...prev, email: normalUser.email, nombre: normalUser.nombre, direccion: normalUser.direccion || '' }));
       }
       onNavigate('home');
     }
@@ -34,20 +39,31 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
   const handleRegister = (e) => {
     e.preventDefault();
 
-    const primerNombre = regNombre.trim().split(' ')[0];
+    setError('');
+    const normalizedEmail = regEmail.trim().toLowerCase();
+    if (normalizedEmail === 'da@gmail.com' || Object.keys(getProfile(normalizedEmail)).length > 0) {
+      setError('Este correo ya está registrado o reservado. Inicia sesión con tu cuenta.');
+      return;
+    }
+
+    if (!regNombre.trim() || !regDireccion.trim()) { setError('Completa nombre y dirección sin usar solo espacios.'); return; }
+    const primerNombre = regNombre.trim();
     const newUser = {
-      email: regEmail,
+      email: regEmail.trim().toLowerCase(),
+      direccion: regDireccion.trim(),
       nombre: primerNombre,
       isAdmin: false
     };
 
+    try { saveProfile(newUser); } catch { setError('No se pudo guardar el perfil en este navegador.'); return; }
     setUser(newUser);
 
     if (setCheckoutData) {
       setCheckoutData((prev) => ({
         ...prev,
         nombre: regNombre,
-        email: regEmail
+        email: regEmail,
+        direccion: regDireccion
       }));
     }
 
@@ -63,7 +79,7 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
   if (user) {
     return (
       <div className="container my-5">
-        <div className="card p-5 shadow-sm mx-auto text-center" style={{ maxWidth: '480px' }}>
+        <div className="card p-3 p-md-5 shadow-sm mx-auto text-center" style={{ maxWidth: '480px' }}>
           <div className="display-4 mb-3">👤</div>
           <h2 className="fw-bold mb-1">
             {user.isAdmin ? 'Administrador' : user.nombre}
@@ -78,7 +94,8 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
 
           <hr />
 
-          <div className="d-flex justify-content-center gap-2 mt-3">
+          <div className="d-flex flex-wrap justify-content-center gap-2 mt-3">
+            {user.isAdmin && <button className="btn btn-primary fw-bold" onClick={() => onNavigate('admin')}>Abrir panel administrador</button>}
             <button
               className="btn btn-outline-secondary fw-bold"
               onClick={() => onNavigate('home')}
@@ -100,13 +117,15 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
   return (
     <div className="container my-5">
       <div className="card p-4 shadow-sm mx-auto" style={{ maxWidth: '450px' }}>
+        <p className="text-muted small">Acceso de demostración: no uses contraseñas reales. Las contraseñas de clientes no se guardan ni verifican; el perfil se recuerda por correo en este navegador.</p>
+        {error && <p role="alert" className="alert alert-danger">{error}</p>}
         {!isRegistering ? (
           <>
             <h3 className="text-center fw-bold mb-4">Iniciar Sesión</h3>
             <form onSubmit={handleLogin}>
               <div className="mb-3">
-                <label className="form-label">Correo Electrónico</label>
-                <input
+                <label htmlFor="login-email" className="form-label">Correo Electrónico</label>
+                <input id="login-email"
                   type="email"
                   className="form-control"
                   required
@@ -116,8 +135,8 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Contraseña</label>
-                <input
+                <label htmlFor="login-password" className="form-label">Contraseña</label>
+                <input id="login-password"
                   type="password"
                   className="form-control"
                   required
@@ -145,8 +164,8 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
             <h3 className="text-center fw-bold mb-4">Crear Cuenta</h3>
             <form onSubmit={handleRegister}>
               <div className="mb-3">
-                <label className="form-label">Nombre Completo</label>
-                <input
+                <label htmlFor="register-name" className="form-label">Nombre Completo</label>
+                <input id="register-name"
                   type="text"
                   className="form-control"
                   required
@@ -156,8 +175,8 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Correo Electrónico</label>
-                <input
+                <label htmlFor="register-email" className="form-label">Correo Electrónico</label>
+                <input id="register-email"
                   type="email"
                   className="form-control"
                   required
@@ -167,8 +186,8 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Contraseña</label>
-                <input
+                <label htmlFor="register-password" className="form-label">Contraseña</label>
+                <input id="register-password"
                   type="password"
                   className="form-control"
                   required
@@ -177,6 +196,8 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
                 />
               </div>
 
+              <div className="mb-3"><label htmlFor="register-address" className="form-label">Dirección</label>
+                <input id="register-address" className="form-control" required value={regDireccion} onChange={(e) => setRegDireccion(e.target.value)} /></div>
               <button type="submit" className="btn btn-success w-100 fw-bold mb-3">
                 Registrarse
               </button>

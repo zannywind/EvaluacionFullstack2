@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ProductCard from '../components/ProductCard';
 
-function ProductsView({ products = [], onAddToCart}) {
+function ProductsView({ products = [], onAddToCart, onViewProduct }) {
   const [search, setSearch] = useState('');
 
   const filteredProducts = products.filter((p) => {
@@ -18,6 +18,7 @@ function ProductsView({ products = [], onAddToCart}) {
         <input
           type="text"
           className="form-control form-control-lg"
+          aria-label="Buscar producto"
           placeholder="Buscar producto..."
           value={search}
           onChange={(e) =>setSearch(e.target.value)}
@@ -27,7 +28,7 @@ function ProductsView({ products = [], onAddToCart}) {
       <div className="row">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((p) => (
-            <ProductCard key={p.id} product={p} onAddToCart={onAddToCart} />
+            <ProductCard key={p.id} product={p} onAddToCart={onAddToCart} onViewProduct={onViewProduct} />
           ))
         ) : (
           <p className="text-muted">No se encontraron productos</p>

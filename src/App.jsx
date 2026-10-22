@@ -10,6 +10,10 @@ import SuccessView from './views/SuccessView';
 import ErrorView from './views/ErrorView';
 import AdminView from './views/AdminView';
 import ProfileView from './views/ProfileView';
+import ProductDetailView from './views/ProductDetailView';
+import AboutView from './views/AboutView';
+import BlogView from './views/BlogView';
+import ContactView from './views/ContactView';
 import { getProducts } from './data/mockData';
 
 function App() {
@@ -17,15 +21,18 @@ function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [lastOrder, setLastOrder] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedPostId, setSelectedPostId] = useState(null);
 
   // Estado de usuario autenticado
   const [user, setUser] = useState(null);
 
-  // Estado persistente del formulario de checkout
+  // Estos datos se conservan entre vistas, pero se reinician al recargar.
   const [checkoutData, setCheckoutData] = useState({
     nombre: '',
     email: '',
-    direccion: ''
+    direccion: '',
+    entrega: 'domicilio'
   });
   const [checkoutError, setCheckoutError] = useState(false);
 
@@ -45,16 +52,42 @@ function App() {
     });
   };
 
+  const showProduct = (product) => {
+    setSelectedProductId(product.id);
+    setCurrentView('detail');
+  };
+
+  const changeUser = (nextUser) => {
+    setUser(nextUser);
+    setCheckoutError(false);
+    setCheckoutData({ nombre: nextUser?.nombre || '', email: nextUser?.email || '',
+      direccion: nextUser?.direccion || '', entrega: 'domicilio' });
+  };
+
+  const changeProducts = (updated) => {
+    setProducts(updated);
+    // Mantener cantidades, actualizando precios o retirando productos eliminados.
+    setCart((previous) => previous.flatMap((item) => {
+      const current = updated.find((product) => product.id === item.id);
+      return current ? [{ ...current, quantity: item.quantity }] : [];
+    }));
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'home':
-        return <HomeView products={products} onAddToCart={handleAddToCart} />;
+        return <HomeView products={products} onAddToCart={handleAddToCart} onViewProduct={showProduct} />;
       case 'products':
-        return <ProductsView products={products} onAddToCart={handleAddToCart} />;
+        return <ProductsView products={products} onAddToCart={handleAddToCart} onViewProduct={showProduct} />;
       case 'categories':
-        return <CategoriesView products={products} onAddToCart={handleAddToCart} />;
+        return <CategoriesView products={products} onAddToCart={handleAddToCart} onViewProduct={showProduct} />;
       case 'offers':
-        return <OffersView products={products} onAddToCart={handleAddToCart} />;
+        return <OffersView products={products} onAddToCart={handleAddToCart} onViewProduct={showProduct} />;
+      case 'detail':
+        return <ProductDetailView product={products.find((p) => p.id === selectedProductId)} onAddToCart={handleAddToCart} onNavigate={setCurrentView} />;
+      case 'about': return <AboutView />;
+      case 'blog': return <BlogView postId={selectedPostId} onSelectPost={setSelectedPostId} />;
+      case 'contact': return <ContactView />;
       case 'cart':
         return (
           <CartView
@@ -86,18 +119,17 @@ function App() {
       case 'error':
         return <ErrorView onNavigate={(view) => setCurrentView(view)} />;
       case 'admin':
-        return <AdminView products={products} setProducts={setProducts} />;
+        return user?.isAdmin ? <AdminView products={products} setProducts={changeProducts} user={user} onUserChange={setUser} /> : <p role="alert">Acceso reservado al administrador.</p>;
       case 'profile':
         return (
           <ProfileView
             user={user}
-            setUser={setUser}
+            setUser={changeUser}
             onNavigate={(view) => setCurrentView(view)}
-            setCheckoutData={setCheckoutData}
           />
         );
       default:
-        return <HomeView products={products} onAddToCart={handleAddToCart} />;
+        return <HomeView products={products} onAddToCart={handleAddToCart} onViewProduct={showProduct} />;
     }
   };
 

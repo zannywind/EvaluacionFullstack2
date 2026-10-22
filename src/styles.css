@@ -78,3 +78,8 @@ body {
   font-weight: 700;
   text-decoration: underline;
 }
+
+/* Long names and mobile controls must stay inside the viewport. */
+.card, .list-group-item { overflow-wrap: anywhere; }
+.navbar .nav-link { text-align: left; }
+@media (max-width: 575px) { .table { min-width: 540px; } }

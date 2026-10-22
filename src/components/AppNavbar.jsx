@@ -1,81 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 
 function AppNavbar({ currentView, setCurrentView, cartCount = 0, user }) {
-  return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-      <a
-        className="navbar-brand fw-bold"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          setCurrentView('home');
-        }}
-      >
-        Mai estor
-      </a>
-
-      {/* Links de navegación principales (SIN Perfil/Registro ni Admin por defecto) */}
-      <div className="navbar-nav me-auto">
-        <button
-          className={`nav-link btn btn-link ${currentView === 'home' ? 'active' : ''}`}
-          onClick={() => setCurrentView('home')}
-        >
-          Home
-        </button>
-        <button
-          className={`nav-link btn btn-link ${currentView === 'products' ? 'active' : ''}`}
-          onClick={() => setCurrentView('products')}
-        >
-          Productos
-        </button>
-        <button
-          className={`nav-link btn btn-link ${currentView === 'categories' ? 'active' : ''}`}
-          onClick={() => setCurrentView('categories')}
-        >
-          Categorías
-        </button>
-        <button
-          className={`nav-link btn btn-link ${currentView === 'offers' ? 'active' : ''}`}
-          onClick={() => setCurrentView('offers')}
-        >
-          Ofertas
-        </button>
-
-        {/* Panel Admin SOLO si está logueado como Admin */}
-        {user && user.isAdmin && (
-          <button
-            className={`nav-link btn btn-link ${currentView === 'admin' ? 'active' : ''}`}
-            onClick={() => setCurrentView('admin')}
-          >
-            Panel Admin
-          </button>
-        )}
-      </div>
-
-      {/* Zona Derecha: Perfil / Registro + Carrito */}
-      <div className="d-flex align-items-center gap-2">
-        {user ? (
-          <button
-            className="btn btn-outline-light fw-bold"
-            onClick={() => setCurrentView('profile')}
-          >
-            👤 {user.isAdmin ? 'admin' : user.nombre}
-          </button>
-        ) : (
-          <button
-            className="btn btn-primary fw-bold"
-            onClick={() => setCurrentView('profile')}
-          >
-            Iniciar Sesión / Registro
-          </button>
-        )}
-
-        <button className="btn btn-success" onClick={() => setCurrentView('cart')}>
-          Carrito <span className="badge bg-light text-dark ms-1">{cartCount}</span>
-        </button>
-      </div>
-    </nav>
-  );
+  const [expanded, setExpanded] = useState(false);
+  const navigate = (view) => { setCurrentView(view); setExpanded(false); };
+  const links = [['home', 'Home'], ['products', 'Productos'], ['categories', 'Categorías'],
+    ['offers', 'Ofertas'], ['about', 'Nosotros'], ['blog', 'Blog'], ['contact', 'Contacto']];
+  return <Navbar bg="dark" variant="dark" expand="xl" expanded={expanded} onToggle={setExpanded}>
+    <Container fluid>
+      <Navbar.Brand as="button" className="btn" onClick={() => navigate('home')}><img src="/mai-estor-logo.png" alt="Mai estor" width="156" height="52" style={{ objectFit: 'contain' }} /></Navbar.Brand>
+      <Navbar.Toggle aria-controls="store-navigation" aria-label="Abrir menú" />
+      <Navbar.Collapse id="store-navigation">
+        <Nav className="me-auto">{links.map(([view, label]) =>
+          <Nav.Link as="button" key={view} active={currentView === view} onClick={() => navigate(view)}>{label}</Nav.Link>)}
+          {user?.isAdmin && <Nav.Link as="button" active={currentView === 'admin'} onClick={() => navigate('admin')}>Panel Admin</Nav.Link>}
+        </Nav>
+        <div className="d-flex flex-wrap gap-2 py-2">
+          <Button variant="outline-light" onClick={() => navigate('profile')}>{user ? user.nombre : 'Iniciar Sesión / Registro'}</Button>
+          <Button variant="success" onClick={() => navigate('cart')}>Carrito <span className="badge bg-light text-dark">{cartCount}</span></Button>
+        </div>
+      </Navbar.Collapse>
+    </Container>
+  </Navbar>;
 }
-
 export default AppNavbar;

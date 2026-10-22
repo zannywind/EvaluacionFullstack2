@@ -3,9 +3,9 @@ import React from 'react';
 function SuccessView({ order, onNavigate }) {
   return (
     <div className="container my-5 text-center">
-      <div className="card p-5 shadow-sm bg-light">
+      <div className="card p-3 p-md-5 shadow-sm bg-light">
         <h1 className="text-success fw-bold mb-3">¡Compra Realizada con Éxito!</h1>
-        <p className="fs-5 text-muted">Número de orden #20261018</p>
+        <p className="fs-5 text-muted">Número de orden #{order?.id || 'Sin orden'}</p>
 
         <hr className="my-4" />
 
@@ -18,9 +18,10 @@ function SuccessView({ order, onNavigate }) {
         </p>
 
         <h3 className="text-success fw-bold my-3">
-          Total Pagado: ${order?.total?.toLocaleString() || '0'}
+          Total de la compra simulada: ${order?.total?.toLocaleString('es-CL') || '0'}
         </h3>
 
+        {order?.items && <ul className="list-unstyled">{order.items.map((item) => <li key={item.id}>{item.name} × {item.quantity}</li>)}</ul>}
         <div className="mt-4">
           <button
             className="btn btn-primary btn-lg fw-bold px-4"
