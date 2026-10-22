@@ -66,4 +66,27 @@ describe('AdminView', () => {
     expect(lista.length).toBe(products.length - 1);
     expect(lista.some((p) => p.id === products[0].id)).toBe(false);
   });
+
+  it('guarda la categoría seleccionada en el nuevo producto', async () => {
+    spyOn(Date, 'now').and.returnValue(777);
+    const user = userEvent.setup();
+    const setProducts = jasmine.createSpy('setProducts');
+    render(<AdminView products={[]} setProducts={setProducts} />);
+
+    await user.type(screen.getByPlaceholderText('Nombre Producto'), 'Mouse');
+    await user.type(screen.getByPlaceholderText('Precio'), '12000');
+    await user.selectOptions(screen.getByRole('combobox'), 'Categoría 3');
+    await user.click(screen.getByRole('button', { name: 'Guardar' }));
+
+    const nuevo = setProducts.calls.mostRecent().args[0].find((p) => p.id === 777);
+    expect(nuevo.category).toBe('Categoría 3');
+  });
+
+  it('muestra el nombre alternativo y la categoría General si faltan datos', () => {
+    const products = [{ id: 1, nombre: 'Viejo', price: 1000 }];
+    render(<AdminView products={products} setProducts={() => {}} />);
+
+    expect(screen.getByText('Viejo')).toBeTruthy();
+    expect(screen.getByText(/\(General\)/)).toBeTruthy();
+  });
 });

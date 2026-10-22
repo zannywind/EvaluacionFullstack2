@@ -28,4 +28,21 @@ describe('ProductCard', () => {
     expect(onAddToCart).toHaveBeenCalledTimes(1);
     expect(onAddToCart).toHaveBeenCalledWith(producto);
   });
+
+  it('usa nombre y precio en español si no vienen en inglés', () => {
+    render(<ProductCard product={{ nombre: 'Mouse', precio: 12000 }} />);
+
+    expect(screen.getByText('Mouse')).toBeTruthy();
+    expect(screen.getByText(`$${(12000).toLocaleString()}`)).toBeTruthy();
+  });
+
+  it('no renderiza nada sin producto y usa valores por defecto si faltan datos', () => {
+    const { container, unmount } = render(<ProductCard />);
+    expect(container.firstChild).toBeNull();
+    unmount();
+
+    render(<ProductCard product={{}} />);
+    expect(screen.getByText('Producto')).toBeTruthy();
+    expect(screen.getByText('$0')).toBeTruthy();
+  });
 });
