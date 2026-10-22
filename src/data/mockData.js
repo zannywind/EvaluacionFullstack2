@@ -1,5 +1,3 @@
-// src/data/mockData.js
-
 const INITIAL_PRODUCTS = [
   {
     id: 1,
