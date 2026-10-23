@@ -83,9 +83,8 @@ Counter tiene dos pruebas didácticas y no es la evidencia principal de las func
 
 ## Entrega
 
-Repositorio indicado por el estudiante: https://github.com/zannywind/EvaluacionFullstack2
-La copia remota consultada usa Jasmine/Karma y no coincide con esta copia local basada en Vitest.
-Este README no afirma que los cambios locales ya estén publicados. Consultar `docs/ENTREGA.md`.
+Repositorio: https://github.com/zannywind/EvaluacionFullstack2
+La rama main ya contiene la ampliación con Vitest. Esta revisión agrega correcciones finales y pruebas; consultar docs/ENTREGA.md.
 
 ## Flujo administrativo completo
 

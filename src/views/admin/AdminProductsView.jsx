@@ -39,6 +39,7 @@ function AdminProductsView({ products, setProducts }) {
 
   return <section className="my-4">
     <h2>Productos</h2>
+    {error && <p role="alert" className="alert alert-danger">{error}</p>}
     <div className="d-flex gap-2 flex-wrap mb-3"><button className="btn btn-primary" onClick={() => { setForm({ ...emptyForm, category: getCategories()[0] || 'Videojuegos' }); setEditingId(null); setError(''); setMessage(''); setScreen('form'); }}>Nuevo producto</button>
       <button className="btn btn-outline-secondary" onClick={() => setScreen('list')}>Listado de productos</button></div>
     {screen === 'detail' && selected && <article className="card p-3"><h3>{selected.name}</h3><p>Categoría: {selected.category}</p><p>Precio: ${selected.price.toLocaleString('es-CL')}</p><p>Existencias: {selected.stock ?? 10}</p><p>{selected.offer ? 'En oferta' : 'Precio normal'}</p>
@@ -46,7 +47,6 @@ function AdminProductsView({ products, setProducts }) {
     {screen === 'form' &&
     <form onSubmit={handleSave} className="card p-3 p-md-4 my-3">
       <h3 className="h5">{editingId === null ? 'Agregar producto' : 'Editar producto'}</h3>
-      {error && <p role="alert" className="alert alert-danger">{error}</p>}
       <div className="row g-3">
         <div className="col-md-5"><label htmlFor="product-name" className="form-label">Nombre del producto</label>
           <input id="product-name" className="form-control" required value={form.name}

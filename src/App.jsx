@@ -119,7 +119,7 @@ function App() {
       case 'error':
         return <ErrorView onNavigate={(view) => setCurrentView(view)} />;
       case 'admin':
-        return user?.isAdmin ? <AdminView products={products} setProducts={changeProducts} user={user} onUserChange={setUser} /> : <p role="alert">Acceso reservado al administrador.</p>;
+        return user?.isAdmin ? <AdminView products={products} setProducts={changeProducts} user={user} onUserChange={changeUser} /> : <p role="alert">Acceso reservado al administrador.</p>;
       case 'profile':
         return (
           <ProfileView

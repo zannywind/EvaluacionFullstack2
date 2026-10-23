@@ -19,7 +19,7 @@ function HomeView({ products, onAddToCart, onViewProduct }) {
           <ProductCard key= {p.id} product={p} onAddToCart={onAddToCart} onViewProduct={onViewProduct} />
         ))
       ) : (
-        <p>Cargando productos...</p>
+        <p role="status">No hay productos disponibles.</p>
       )}
       </div>
     </div>

@@ -30,7 +30,7 @@ test('flujo integrado: registro, carrito, error, reintento y compra exitosa', as
   expect(screen.getByRole('button', { name: /Carrito 0/ })).toBeInTheDocument();
   expect(getOrders()).toHaveLength(1);
   expect(getOrders()[0]).toMatchObject({ email: 'camila@example.com', cliente: 'Camila Soto' });
-});
+}, 15000); // Flujo integrado con múltiples formularios e interacciones.
 test('navega por detalle de producto, nosotros, blog y contacto', async () => {
   const user = userEvent.setup(); render(<App />);
   await user.click(screen.getAllByRole('button', { name: 'Ver detalle' })[0]);
@@ -64,4 +64,30 @@ test('administrador actualiza precios del carrito y salir oculta su panel', asyn
   expect(screen.getByText('Total: $1.000')).toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: 'admin' })); await user.click(screen.getByRole('button', { name: 'Cerrar Sesión' }));
   expect(screen.queryByRole('button', { name: 'Panel Admin' })).not.toBeInTheDocument();
+});
+
+
+test('un catálogo vacío informa ausencia de productos y no carga indefinidamente', () => {
+  localStorage.setItem('products', '[]'); render(<App />);
+  expect(screen.getByRole('status')).toHaveTextContent('No hay productos disponibles');
+  expect(screen.queryByText('Cargando productos...')).not.toBeInTheDocument();
+});
+
+test('editar perfil administrador sincroniza los datos del checkout', async () => {
+  const user = userEvent.setup(); render(<App />);
+  await user.click(screen.getAllByRole('button', { name: 'Añadir al Carrito' })[0]);
+  await user.click(screen.getByRole('button', { name: 'Iniciar Sesión / Registro' }));
+  await user.type(screen.getByLabelText('Correo Electrónico'), 'da@gmail.com');
+  await user.type(screen.getByLabelText('Contraseña'), 'aaa');
+  await user.click(screen.getByRole('button', { name: 'Ingresar' }));
+  await user.click(screen.getByRole('button', { name: 'Panel Admin' }));
+  await user.click(screen.getByRole('button', { name: 'Perfil administrador' }));
+  await user.clear(screen.getByLabelText('Nombre'));
+  await user.type(screen.getByLabelText('Nombre'), 'Administrador actualizado');
+  await user.type(screen.getByLabelText('Dirección'), 'Calle Nueva 123');
+  await user.click(screen.getByRole('button', { name: 'Guardar perfil' }));
+  await user.click(screen.getByRole('button', { name: /Carrito 1/ }));
+  await user.click(screen.getByRole('button', { name: 'Comprar ahora' }));
+  expect(screen.getByLabelText('Nombre completo')).toHaveValue('Administrador actualizado');
+  expect(screen.getByLabelText('Dirección de envío')).toHaveValue('Calle Nueva 123');
 });

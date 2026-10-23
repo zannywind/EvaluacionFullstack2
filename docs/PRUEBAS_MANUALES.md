@@ -36,3 +36,9 @@ Completar integrantes en ERS; confirmar alcance administrativo con docente; revi
 generar nuevamente cobertura y ZIP si se cambia código; ensayar presentación de 15 minutos y preguntas.
 
 Para el flujo administrativo ampliado seguir también los 10 pasos de FLUJO.md. En Panel Admin el CRUD se encuentra dentro de Productos.
+
+## Regresiones finales para comprobar visualmente
+
+- Eliminar todos los productos: Home debe indicar que no hay productos disponibles.
+- Cambiar nombre/dirección en Perfil administrador: checkout debe mostrar los nuevos datos sin reiniciar sesión.
+- Revisar a 375, 768 y 1366 px y registrar capturas, navegador y resultado. Intento automatizado bloqueado por timeout de conexión del navegador integrado.

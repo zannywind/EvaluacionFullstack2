@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, test, expect } from 'vitest';
+import { beforeEach, afterEach, test, expect, vi } from 'vitest';
+afterEach(() => vi.restoreAllMocks());
 import AdminView from '../views/admin/AdminProductsView';
 import { getProducts } from '../data/mockData';
 function Admin() { const [products, setProducts] = useState(getProducts); return <AdminView products={products} setProducts={setProducts} />; }
@@ -34,4 +35,14 @@ test('validación del panel rechaza nombres vacíos tras quitar espacios', () =>
   fireEvent.change(screen.getByLabelText('Precio'), { target: { value: '100' } });
   fireEvent.submit(screen.getByRole('button', { name: 'Guardar' }).closest('form'));
   expect(screen.getByRole('alert')).toHaveTextContent('nombre'); expect(getProducts()).toHaveLength(5);
+});
+
+
+test('un fallo al eliminar se muestra en el listado y conserva el producto', async () => {
+  render(<Admin />);
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Sin espacio'); });
+  await userEvent.click(screen.getAllByRole('button', { name: /^Eliminar / })[0]);
+  expect(screen.getByRole('alert')).toHaveTextContent('No se pudo guardar');
+  expect(screen.getByText('Zelda: Tears of the Kingdom')).toBeInTheDocument();
+  expect(getProducts()).toHaveLength(5);
 });

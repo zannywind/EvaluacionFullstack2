@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { test, expect, vi } from 'vitest';
+import { beforeEach, afterEach, test, expect, vi } from 'vitest';
+beforeEach(() => localStorage.clear());
+afterEach(() => vi.restoreAllMocks());
 import ChekoutView from '../views/ChekoutView';
 const cart = [{ id: 1, name: 'Juego', price: 1000, quantity: 3 }];
 function setup(initial = { nombre: 'Camila', email: 'c@example.com', direccion: 'Calle 123', entrega: 'domicilio' }, items = cart) {
@@ -38,4 +40,15 @@ test('rechaza datos compuestos solo por espacios', () => {
 test('un carrito vacío no permite confirmar una compra', () => {
   setup(undefined, []); expect(screen.queryByRole('button', { name: /Confirmar compra/ })).not.toBeInTheDocument();
   expect(screen.getByText('Tu carrito está vacío.')).toBeInTheDocument();
+});
+
+
+test('si guardar el pedido falla, conserva carrito y permite reintentar', async () => {
+  const props = setup();
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Sin espacio'); });
+  await userEvent.click(screen.getByRole('button', { name: /Confirmar compra/ }));
+  expect(props.onNavigate).toHaveBeenCalledWith('error');
+  expect(props.setCart).not.toHaveBeenCalled();
+  expect(props.setLastOrder).not.toHaveBeenCalled();
+  expect(localStorage.getItem('store-orders')).toBeNull();
 });
