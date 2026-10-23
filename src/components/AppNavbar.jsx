@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 
+// DEFENSA 10 — MENÚ: recibe vista, cantidad del carrito y usuario desde App mediante props.
+// expanded controla el menú colapsable de React Bootstrap; expand="xl" lo expande desde xl.
+// El enlace Panel Admin solo aparece si user.isAdmin; App también verifica el rol al mostrarlo.
 function AppNavbar({ currentView, setCurrentView, cartCount = 0, user }) {
   const [expanded, setExpanded] = useState(false);
   const navigate = (view) => { setCurrentView(view); setExpanded(false); };

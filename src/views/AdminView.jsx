@@ -8,6 +8,9 @@ import AdminUsersView from './admin/AdminUsersView';
 import AdminReportsView from './admin/AdminReportsView';
 import AdminStockView from './admin/AdminStockView';
 
+// DEFENSA 11 — ADMINISTRACIÓN: screen elige una subpantalla, igual que currentView en App.
+// Los pedidos se leen al montar el panel; dashboard y reportes usan compras persistidas.
+// onUserChange informa a App cuando se modifica el perfil, para actualizar también el checkout.
 export default function AdminView({ products, setProducts, user, onUserChange }) {
   const [screen, setScreen] = useState('dashboard'); const [orders] = useState(getOrders);
   const [profile, setProfile] = useState({ nombre: user?.nombre || 'admin', direccion: user?.direccion || '' });

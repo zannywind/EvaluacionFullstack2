@@ -16,7 +16,11 @@ import BlogView from './views/BlogView';
 import ContactView from './views/ContactView';
 import { getProducts } from './data/mockData';
 
+// DEFENSA 02 — COORDINADOR: App comparte datos entre menú, catálogo, carrito y checkout.
+// Recorrido: main.jsx -> App -> vista elegida -> componentes como ProductCard.
 function App() {
+  // ESTADO: useState devuelve el valor actual y una función para actualizarlo.
+  // Al actualizar estado, React vuelve a calcular la interfaz. Estos datos no sobreviven a recargar.
   const [currentView, setCurrentView] = useState('home');
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -36,10 +40,15 @@ function App() {
   });
   const [checkoutError, setCheckoutError] = useState(false);
 
+// EFECTO: al montar App leemos los productos de mockData y los ponemos en estado.
+  // [] indica que el efecto no depende de valores cambiantes; no se ejecuta por cada render normal.
   useEffect(() => {
     setProducts(getProducts());
   }, []);
 
+  // EVENTO: ProductCard llama a esta función mediante una prop cuando se pulsa Agregar.
+  // Usamos el estado anterior: si existe el producto, sumamos cantidad; si no, lo añadimos.
+  // map y ... crean nuevos arrays/objetos, sin modificar directamente el estado anterior.
   const handleAddToCart = (product) => {
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.id === product.id);
@@ -57,6 +66,7 @@ function App() {
     setCurrentView('detail');
   };
 
+  // Al cambiar usuario también preparamos sus datos para el formulario del checkout.
   const changeUser = (nextUser) => {
     setUser(nextUser);
     setCheckoutError(false);
@@ -73,6 +83,8 @@ function App() {
     }));
   };
 
+  // NAVEGACIÓN Y CONDICIONALES: currentView selecciona qué componente devolver.
+  // Cambiar de pantalla aquí no cambia la URL ni implementa el historial de React Router.
   const renderView = () => {
     switch (currentView) {
       case 'home':
@@ -118,6 +130,7 @@ function App() {
         );
       case 'error':
         return <ErrorView onNavigate={(view) => setCurrentView(view)} />;
+      // Control de interfaz por rol; no es seguridad de un servidor ni autenticación real.
       case 'admin':
         return user?.isAdmin ? <AdminView products={products} setProducts={changeProducts} user={user} onUserChange={changeUser} /> : <p role="alert">Acceso reservado al administrador.</p>;
       case 'profile':
@@ -133,6 +146,7 @@ function App() {
     }
   };
 
+  // DATO CALCULADO: reduce suma cantidades; no necesitamos otro estado para este total.
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (

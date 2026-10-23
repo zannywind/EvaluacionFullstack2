@@ -1,6 +1,8 @@
 import React from 'react';
 
+// DEFENSA 05 — CARRITO: recibe el estado de App y funciones para cambiarlo y navegar.
 function CartView({ cart, setCart, onNavigate }) {
+  // filter conserva todos los productos excepto el id elegido; elimina la línea completa.
   const handleRemoveItem = (id) => {
     setCart(cart.filter((item) => item.id !== id));
   };
@@ -9,8 +11,11 @@ function CartView({ cart, setCart, onNavigate }) {
     setCart([]);
   };
 
+  // reduce acumula precio por cantidad. El total se recalcula después de cada cambio.
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
+  // CONDICIONAL: carrito vacío muestra un aviso; con productos muestra tabla y acciones.
+  // table-responsive permite desplazar la tabla dentro de su contenedor en pantallas pequeñas.
   return (
     <div className="container my-4">
       <h2 className="fw-bold mb-4">Carrito de Compras</h2>

@@ -1,3 +1,5 @@
+// DEFENSA — REPORTES: reduce suma importes; Map agrupa unidades e ingresos por producto.
+// Se calculan desde pedidos guardados; no se inventan ventas para llenar la pantalla.
 export default function AdminReportsView({ orders, products }) {
   const total = orders.reduce((sum, o) => sum + o.total, 0);
   const sold = new Map();

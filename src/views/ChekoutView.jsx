@@ -1,20 +1,28 @@
 import { recordOrder } from '../data/adminStore';
 import React, { useState } from 'react';
 
+// DEFENSA 06 — CHECKOUT: formulario de compra simulada; no realiza cobros reales.
+// checkoutData vive en App para conservar los datos al ir al error y volver.
 function ChekoutView({ cart, setCart, onNavigate, setLastOrder, checkoutData, setCheckoutData, hasError, setHasError }) {
   const [simulateFailure, setSimulateFailure] = useState(false);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const units = cart.reduce((sum, item) => sum + item.quantity, 0);
   const delivery = checkoutData.entrega || 'domicilio';
+  // FORMULARIO CONTROLADO: value lee del estado y onChange llama a change para actualizarlo.
+  // ...prev conserva los otros campos; [key] elige cuál cambiar (nombre, email, etc.).
   const change = (key, value) => { setHasError(false); setCheckoutData((prev) => ({ ...prev, [key]: value })); };
   const handleSubmit = (event) => {
+    // Evita el envío tradicional del formulario y su recarga; procesamos con JavaScript.
     event.preventDefault();
+    // VALIDACIÓN: trim rechaza espacios; la dirección solo es obligatoria para domicilio.
     if (!cart.length || !checkoutData.nombre.trim() || !checkoutData.email.trim() ||
       (delivery === 'domicilio' && !checkoutData.direccion.trim())) {
       setHasError(true); return;
     }
     if (simulateFailure) { setHasError(true); onNavigate('error'); return; }
     try {
+    // Primero persistimos el pedido. Solo si funciona vaciamos el carrito y mostramos éxito.
+    // Si guardar falla, catch lleva al error sin perder el carrito para poder reintentar.
     const order = recordOrder({ id: crypto.randomUUID(), email: checkoutData.email, cliente: checkoutData.nombre.trim(),
       direccion: delivery === 'retiro' ? 'Retiro en tienda' : checkoutData.direccion.trim(),
       entrega: delivery, total, items: cart.map((item) => ({ ...item })) });

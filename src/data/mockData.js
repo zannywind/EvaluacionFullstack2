@@ -1,5 +1,7 @@
 // src/data/mockData.js
 
+// DEFENSA 07 — FUENTE SIMULADA: no hay API ni base de datos remota.
+// Estos productos se usan cuando no existe un catálogo válido guardado en el navegador.
 const INITIAL_PRODUCTS = [
   {
     id: 1,
@@ -46,6 +48,8 @@ const INITIAL_PRODUCTS = [
 // Actualiza nombres genéricos de versiones anteriores sin borrar productos editados.
 export const categoryName = (name) => ({ 'Categoría 1': 'Videojuegos', 'Categoría 2': 'Consolas', 'Categoría 3': 'Accesorios' }[name] || name);
 
+// R de CRUD (Read/leer): recupera JSON, comprueba datos y adapta registros antiguos.
+// Un array vacío es válido: significa que se eliminaron todos los productos.
 export const getProducts = () => {
     try {
         const stored = JSON.parse(localStorage.getItem('products'));
@@ -65,11 +69,14 @@ export const getProducts = () => {
     return saveProducts(INITIAL_PRODUCTS);
 };
 
+// PERSISTENCIA: localStorage guarda texto. stringify convierte el array a texto JSON;
+// JSON.parse lo convierte de vuelta al leer. Guardar no actualiza React automáticamente.
 const saveProducts = (products) => {
     localStorage.setItem('products', JSON.stringify(products));
     return products;
 };
 
+// Las reglas de datos se centralizan aquí, además de las validaciones del formulario.
 const validateProduct = (product) => {
     if (!product.name?.trim() || !Number.isFinite(Number(product.price)) || Number(product.price) <= 0) {
         throw new Error('Ingresa un nombre y un precio mayor que cero.');
@@ -79,12 +86,14 @@ const validateProduct = (product) => {
     return { ...product, stock, name: product.name.trim(), price: Number(product.price) };
 };
 
+// C de CRUD (Create/crear): valida, asigna un id único y guarda una lista nueva.
 export const addProduct = (newProduct) => {
     const current = getProducts();
     const created = { ...validateProduct(newProduct), id: crypto.randomUUID() };
     return saveProducts([...current, created]);
 };
 
+// U de CRUD (Update/actualizar): busca por id y reemplaza solo el producto elegido.
 export const updateProduct = (id, changes) => {
     const current = getProducts();
     const product = current.find((p) => p.id === id);
@@ -93,6 +102,7 @@ export const updateProduct = (id, changes) => {
     return saveProducts(current.map((p) => p.id === id ? updated : p));
 };
 
+// D de CRUD (Delete/eliminar): filter excluye el id y persiste la lista restante.
 export const deleteProduct = (id) => {
     const current = getProducts();
     return saveProducts(current.filter((p) => p.id !== id));

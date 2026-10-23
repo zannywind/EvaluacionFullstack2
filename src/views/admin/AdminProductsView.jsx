@@ -4,9 +4,12 @@ import { addProduct, updateProduct, deleteProduct } from '../../data/mockData';
 
 const emptyForm = { name: '', price: '', category: 'Videojuegos', offer: false, stock: 10 };
 
+// DEFENSA 08 — CRUD EN PANTALLA: conecta el formulario con las funciones de mockData.
+// App pasa changeProducts como setProducts: actualiza catálogo y sincroniza el carrito.
 function AdminProductsView({ products, setProducts }) {
   const [screen, setScreen] = useState('list');
   const [selected, setSelected] = useState(null);
+  // form guarda lo escrito; editingId distingue crear (null) de editar un producto existente.
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
@@ -14,10 +17,12 @@ function AdminProductsView({ products, setProducts }) {
 
   const reset = () => { setForm(emptyForm); setEditingId(null); setError(''); setScreen('list'); };
   const handleSave = (event) => {
+    // Evita recarga. Number convierte los valores del formulario antes de validarlos.
     event.preventDefault();
     try {
       const data = { ...form, price: Number(form.price), stock: Number(form.stock) };
       const updated = editingId === null ? addProduct(data) : updateProduct(editingId, data);
+      // Persistencia y estado son distintos: las funciones CRUD guardan, esta llamada refresca React.
       setProducts(updated);
       setMessage(editingId === null ? 'Producto creado.' : 'Producto actualizado.');
       reset();
@@ -37,6 +42,8 @@ function AdminProductsView({ products, setProducts }) {
     } catch { setError('No se pudo guardar el cambio en este navegador.'); }
   };
 
+  // Cada input usa value/checked y onChange: formulario controlado por estado.
+  // screen decide entre listado, detalle y formulario; error/message explican el resultado.
   return <section className="my-4">
     <h2>Productos</h2>
     {error && <p role="alert" className="alert alert-danger">{error}</p>}

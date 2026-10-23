@@ -43,6 +43,8 @@ test('un carrito vacío no permite confirmar una compra', () => {
 });
 
 
+// DEFENSA — CASO LÍMITE Y MOCK: spyOn sustituye setItem para simular almacenamiento lleno.
+// Comprobamos que se informa el error y no se vacía el carrito ni se confirma el pedido.
 test('si guardar el pedido falla, conserva carrito y permite reintentar', async () => {
   const props = setup();
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Sin espacio'); });

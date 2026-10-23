@@ -1,4 +1,6 @@
 import { useState } from 'react';
+// DEFENSA — BOLETA: muestra la copia del pedido guardado al comprar, no los precios actuales.
+// selected decide si vemos el listado o el detalle; es una boleta académica, no tributaria.
 export function Receipt({ order, onBack }) {
   return <article className="card p-3"><h3>Boleta de demostración #{order.id}</h3><p>No es un documento tributario ni acredita un pago real.</p>
     <p>Cliente: {order.cliente} — {order.email}</p><p>Fecha: {new Date(order.date).toLocaleString('es-CL')}</p><p>Entrega: {order.direccion}</p>

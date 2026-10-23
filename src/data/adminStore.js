@@ -1,6 +1,8 @@
 import { getProducts, categoryName } from './mockData';
 import { getProfile, saveProfile } from './userProfiles';
 
+// DEFENSA 12 — DATOS ADMINISTRATIVOS: categorías, usuarios y pedidos en localStorage.
+// Leer JSON inválido devuelve una lista vacía; los errores de escritura llegan al formulario.
 function readList(key) {
   try { const data = JSON.parse(localStorage.getItem(key)); return Array.isArray(data) ? data : []; }
   catch { return []; }
@@ -8,6 +10,7 @@ function readList(key) {
 export function getCategories() {
   return [...new Set([...readList('store-categories').map(categoryName), ...getProducts().map((p) => p.category)].filter(Boolean))];
 }
+// Renombrar categoría también actualiza los productos asociados para mantener consistencia.
 export function saveCategory(name, previous = null) {
   const clean = name.trim();
   if (!clean) throw new Error('Escribe un nombre de categoría.');
@@ -41,6 +44,7 @@ export function saveUser(data, editing = false) {
   saveProfile({ email, nombre: data.nombre.trim(), direccion: data.direccion.trim() });
 }
 export const getOrders = () => readList('store-orders');
+// Guardamos fecha y copia histórica del pedido; sus precios no dependen del catálogo futuro.
 export function recordOrder(order) {
   const saved = { ...order, email: order.email.trim().toLowerCase(), date: new Date().toISOString() };
   localStorage.setItem('store-orders', JSON.stringify([...getOrders(), saved]));

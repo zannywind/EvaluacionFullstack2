@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { getProfile, saveProfile } from '../data/userProfiles';
 
+// DEFENSA 09 — PERFIL: acceso de demostración, no autenticación segura de producción.
+// Clientes: el perfil se recuerda por correo; no se guardan ni verifican sus contraseñas.
+// Administrador de demostración: da@gmail.com / aaa. App recibe el usuario mediante setUser.
 function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
   const [isRegistering, setIsRegistering] = useState(false);
 
@@ -36,6 +39,7 @@ function ProfileView({ user, setUser, onNavigate, setCheckoutData }) {
     }
   };
 
+  // REGISTRO: valida campos y correo duplicado/reservado antes de guardar el perfil.
   const handleRegister = (e) => {
     e.preventDefault();
 
